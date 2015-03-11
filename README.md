@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/jonathanchrisp/namely.svg?branch=master)](https://travis-ci.org/jonathanchrisp/namely)
+
 # namely
 A npm package for the Namely API
 
