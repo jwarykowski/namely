@@ -1,0 +1,27 @@
+{
+  "name": "namely",
+  "version": "0.0.1",
+  "description": "A JS wrapper for the Namely API",
+  "main": "index.js",
+  "scripts": {
+    "test": "istanbul cover _mocha test",
+    "lint": "jshint . && jscs ."
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@gite.brandwatch.com:jonathan/namely.git"
+  },
+  "author": "Jonathan Chrisp",
+  "license": "MIT",
+  "dependencies": {
+    "request": "^2.53.0"
+  },
+  "devDependencies": {
+    "expectations": "^0.4.2",
+    "istanbul": "^0.3.7",
+    "jscs": "^1.11.3",
+    "jshint": "^2.6.3",
+    "mocha": "^2.2.1",
+    "sinon": "^1.13.0"
+  }
+}
