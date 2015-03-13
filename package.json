@@ -4,7 +4,7 @@
   "description": "A JS wrapper for the Namely API",
   "main": "index.js",
   "scripts": {
-    "test": "istanbul cover _mocha test",
+    "test": "istanbul cover ./node_modules/mocha/bin/_mocha --report lcovonly -- -R spec && cat ./coverage/lcov.info | ./node_modules/coveralls/bin/coveralls.js && rm -rf ./coverage",
     "lint": "jshint . && jscs ."
   },
   "repository": {
@@ -17,11 +17,14 @@
     "request": "^2.53.0"
   },
   "devDependencies": {
+    "coveralls": "^2.11.2",
     "expectations": "^0.4.2",
     "istanbul": "^0.3.7",
     "jscs": "^1.11.3",
     "jshint": "^2.6.3",
     "mocha": "^2.2.1",
+    "mocha-lcov-reporter": "0.0.2",
+    "proxyquire": "^1.4.0",
     "sinon": "^1.13.0"
   }
 }
