@@ -148,7 +148,7 @@ describe('index', function () {
 
             it('it calls send and passes the correct arguments', function () {
                 expect(sendStub.calledOnce).toEqual(true);
-                expect(sendStub.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles');
+                expect(sendStub.args[0][0]).toEqual('profiles');
                 expect(sendStub.args[0][1]).toEqual(undefined);
                 expect(sendStub.args[0][2]).toEqual(undefined);
             });
@@ -169,7 +169,7 @@ describe('index', function () {
 
             it('it calls send and passes the correct arguments', function () {
                 expect(sendStub.calledOnce).toEqual(true);
-                expect(sendStub.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles');
+                expect(sendStub.args[0][0]).toEqual('profiles');
                 expect(sendStub.args[0][1]).toEqual({limit: 100, after: '12345678790'});
                 expect(sendStub.args[0][2]).toEqual(undefined);
             });

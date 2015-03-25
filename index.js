@@ -19,8 +19,8 @@ function Namely(options) {
     }
 }
 
-Namely.prototype.send = function (path, opts, cb) {
-    path = path + '.json';
+Namely.prototype.send = function (path, opts, cb, method) {
+    path = this.apiEndpoint + '/' + path + '.json';
     opts = opts || {};
 
     opts.headers = {
@@ -29,17 +29,22 @@ Namely.prototype.send = function (path, opts, cb) {
 
     opts.json = true;
 
-    request(path, opts, function (error, response, body) {
+    if (method) {
+        request[method](path, opts, requestCallback);
+    } else {
+        request(path, opts, requestCallback);
+    }
+
+    function requestCallback(error, response, body) {
         if (error) {
             return cb(error);
         }
-
         cb(null, response, body);
-    });
+    }
 };
 
 Namely.prototype.profiles = function (opts, cb) {
-    this.send(this.apiEndpoint + '/profiles', opts, cb);
+    this.send('profiles', opts, cb);
 };
 
 module.exports = Namely;
