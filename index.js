@@ -29,7 +29,7 @@ Namely.prototype.send = function (path, opts, cb) {
 
     opts.json = true;
 
-    request(path, opts, function (error, response, body) {
+    request(path, opts, function (error, body, response) {
         if (error) {
             return cb(error);
         }
