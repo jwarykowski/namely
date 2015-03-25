@@ -26,14 +26,14 @@ Call `namelyApi.send(path, options, callback)` with the following parameters:
 @param {object} options The options to pass with your api call, structured per Namely's docs
 @param {function} callback A callback function. Will be sent the following params:
     @param {string} error An error
-    @param {object} body The body of the request set
     @param {object} response The server response
+    @param {object} body The body of the request set
 ```
 An example:
 ```
 //Post an event
 namelyiApi.send('events', { "body": {"events": [{"content": "hello world}] }},
-    function(error, body, response) {
+    function(error, response, body) {
         if (error) {
             console.log(error);
         } else {
