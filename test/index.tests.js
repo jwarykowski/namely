@@ -16,7 +16,6 @@ describe('index', function () {
             request: {
                 delete: sandbox.stub(),
                 get: sandbox.stub(),
-                patch: sandbox.stub(),
                 post: sandbox.stub(),
                 put: sandbox.stub
             }
@@ -128,11 +127,10 @@ describe('index', function () {
         });
 
         describe('instance methods', function () {
-            it('creates get, post, put, patch and delete methods', function (){
+            it('creates get, post, put and delete methods', function (){
                 expect(namely.get).toBeDefined();
                 expect(namely.post).toBeDefined();
                 expect(namely.put).toBeDefined();
-                expect(namely.patch).toBeDefined();
                 expect(namely.delete).toBeDefined();
             });
 
@@ -201,7 +199,7 @@ describe('index', function () {
     });
 
     describe('request methods', function () {
-        describe('get, post, put, patch, delete methods', function () {
+        describe('get, post, put, delete methods', function () {
             var sendStub;
 
             beforeEach(function () {
@@ -249,20 +247,6 @@ describe('index', function () {
                 it('passes the correct arguments to send method', function() {
                     expect(sendStub.called).toEqual(true);
                     expect(sendStub.args[0][0]).toEqual('put');
-                    expect(sendStub.args[0][1]).toEqual('profiles/1');
-                    expect(sendStub.args[0][2]).toEqual({});
-                    expect(typeof(sendStub.args[0][3])).toEqual('function');
-                });
-            });
-
-            describe('patch', function () {
-                beforeEach(function () {
-                    namely.patch('profiles/1', {}, function () {});
-                });
-
-                it('passes the correct arguments to send method', function() {
-                    expect(sendStub.called).toEqual(true);
-                    expect(sendStub.args[0][0]).toEqual('patch');
                     expect(sendStub.args[0][1]).toEqual('profiles/1');
                     expect(sendStub.args[0][2]).toEqual({});
                     expect(typeof(sendStub.args[0][3])).toEqual('function');
