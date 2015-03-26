@@ -1,6 +1,6 @@
 'use strict';
 
-var methods = ['get', 'post', 'put', 'delete'],
+var methods = ['get', 'post', 'put'],
     request = require('request').defaults({
         json: true
     });
