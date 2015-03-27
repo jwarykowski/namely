@@ -268,23 +268,22 @@ describe('index', function () {
 
             it('sets authorization access token in headers before sending request', function () {
                 expect(sendSpy.calledOnce).toEqual(true);
-                expect(typeof(stubs.request.get.args[0][0])).toEqual('object');
-                expect(typeof(stubs.request.get.args[0][0].headers)).toEqual('object');
-                expect(stubs.request.get.args[0][0].headers.authorization).
+
+                expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json');
+                expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                expect(stubs.request.get.args[0][1].headers.authorization).
                     toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
             });
 
             it('calls request method passing correct arguments', function () {
                 expect(stubs.request.get.calledOnce).toEqual(true);
-                expect(stubs.request.get.args[0][0].uri).toEqual('https://companyName.namely.com/api/v1/profiles.json');
-                expect(stubs.request.get.args[0][0]).toEqual({
-                    headers: {
-                        authorization: 'Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
-                    },
-                    json: true,
-                    uri: 'https://companyName.namely.com/api/v1/profiles.json'
-                });
-                expect(typeof(stubs.request.get.args[0][1])).toEqual('function');
+                expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json');
+                expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                expect(stubs.request.get.args[0][1].headers.authorization).
+                    toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
+                expect(typeof(stubs.request.get.args[0][2])).toEqual('function');
             });
 
             describe('with no options', function () {
@@ -294,10 +293,12 @@ describe('index', function () {
 
                 it('sets the callback to be opts', function () {
                     expect(sendSpy.calledOnce).toEqual(true);
-                     expect(typeof(stubs.request.get.args[0][0])).toEqual('object');
-                    expect(typeof(stubs.request.get.args[0][0].headers)).toEqual('object');
-                    expect(stubs.request.get.args[0][0].headers.authorization).
+                    expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json')
+                    expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                    expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                    expect(stubs.request.get.args[0][1].headers.authorization).
                         toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
+                    expect(typeof(stubs.request.get.args[0][2])).toEqual('function');
                 });
             });
 
