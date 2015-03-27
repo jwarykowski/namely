@@ -13,7 +13,11 @@ describe('index', function () {
         sandbox = sinon.sandbox.create();
 
         stubs = {
-            request: sandbox.stub()
+            request: {
+                get: sandbox.stub(),
+                post: sandbox.stub(),
+                put: sandbox.stub
+            }
         };
 
         Namely = proxyquire('..', stubs);
@@ -60,7 +64,7 @@ describe('index', function () {
 
             it('sets the appropriate api endpoint based off of options passed', function () {
                 expect(namely.apiEndpoint).toBeDefined();
-                expect(namely.apiEndpoint).toEqual('https://companyName.namely.com/api/v1');
+                expect(namely.apiEndpoint).toEqual('https://companyName.namely.com/api/v1/');
             });
         });
 
@@ -91,7 +95,7 @@ describe('index', function () {
 
             it('sets the appropriate api endpoint based off of options passed', function () {
                 expect(namely.apiEndpoint).toBeDefined();
-                expect(namely.apiEndpoint).toEqual('https://testing.namely.com/api/v2');
+                expect(namely.apiEndpoint).toEqual('https://testing.namely.com/api/v2/');
             });
         });
 
@@ -120,11 +124,27 @@ describe('index', function () {
                 }).toThrow('Namely must be initialized with an access token');
             });
         });
+
+        describe('instance methods', function () {
+            it('creates get, post, and put methods', function (){
+                expect(namely.get).toBeDefined();
+                expect(namely.post).toBeDefined();
+                expect(namely.put).toBeDefined();
+            });
+
+            it('has a send method', function () {
+                expect(namely.send).toBeDefined();
+            });
+
+            it('has api methods', function() {
+                expect(namely.profiles).toBeDefined();
+            });
+        });
     });
 
     describe('profiles', function () {
-        var profileSpy,
-            sendStub;
+        var getStub,
+            profileSpy;
 
         beforeEach(function () {
             namely = new Namely({
@@ -132,8 +152,8 @@ describe('index', function () {
                 companyName: 'companyName'
             });
 
+            getStub = sandbox.stub(namely, 'get');
             profileSpy = sandbox.spy(namely, 'profiles');
-            sendStub   = sandbox.stub(namely, 'send');
         });
 
         describe('with no options', function () {
@@ -147,10 +167,10 @@ describe('index', function () {
             });
 
             it('it calls send and passes the correct arguments', function () {
-                expect(sendStub.calledOnce).toEqual(true);
-                expect(sendStub.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles');
-                expect(sendStub.args[0][1]).toEqual(undefined);
-                expect(sendStub.args[0][2]).toEqual(undefined);
+                expect(getStub.calledOnce).toEqual(true);
+                expect(getStub.args[0][0]).toEqual('profiles');
+                expect(getStub.args[0][1]).toEqual(undefined);
+                expect(getStub.args[0][2]).toEqual(undefined);
             });
         });
 
@@ -168,85 +188,179 @@ describe('index', function () {
             });
 
             it('it calls send and passes the correct arguments', function () {
-                expect(sendStub.calledOnce).toEqual(true);
-                expect(sendStub.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles');
-                expect(sendStub.args[0][1]).toEqual({limit: 100, after: '12345678790'});
-                expect(sendStub.args[0][2]).toEqual(undefined);
+                expect(getStub.calledOnce).toEqual(true);
+                expect(getStub.args[0][0]).toEqual('profiles');
+                expect(getStub.args[0][1]).toEqual({limit: 100, after: '12345678790'});
+                expect(getStub.args[0][2]).toEqual(undefined);
             });
         });
     });
 
-    describe('send', function () {
-        var sendSpy;
-
-        beforeEach(function () {
-            namely = new Namely({
-                accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
-                companyName: 'companyName'
-            });
-
-            sendSpy = sandbox.spy(namely, 'send');
-
-            namely.profiles();
-        });
-
-        it('sets authorization access token in headers before sending request', function () {
-            expect(sendSpy.calledOnce).toEqual(true);
-            expect(typeof(stubs.request.args[0][1])).toEqual('object');
-            expect(typeof(stubs.request.args[0][1].headers)).toEqual('object');
-            expect(stubs.request.args[0][1].headers.authorization).toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
-        });
-
-        it('appends .json to the url path before sending request', function () {
-            expect(sendSpy.calledOnce).toEqual(true);
-            expect(typeof(stubs.request.args[0][1])).toEqual('object');
-            expect(stubs.request.args[0][1].json).toEqual(true);
-        });
-
-        it('calls request passing correct arguments', function () {
-            expect(stubs.request.calledOnce).toEqual(true);
-            expect(stubs.request.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json');
-            expect(stubs.request.args[0][1]).toEqual({
-                headers: {
-                    authorization: 'Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
-                },
-                json: true
-            });
-            expect(typeof(stubs.request.args[0][2])).toEqual('function');
-        });
-
-        describe('callback', function () {
-            var callbackSpy;
+    describe('request methods', function () {
+        describe('get, post, and put methods', function () {
+            var sendStub;
 
             beforeEach(function () {
-                callbackSpy = sandbox.spy();
+                namely = new Namely({
+                    accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
+                    companyName: 'companyName'
+                });
+
+                sendStub = sandbox.stub(namely, 'send');
             });
 
-            describe('error', function () {
+            describe('get', function () {
                 beforeEach(function () {
-                    stubs = {
-                        request: sandbox.stub().yields('Fake Error', {}, {})
-                    };
+                    namely.get('profiles', {}, function () {});
+                });
 
-                    Namely = proxyquire('..', stubs);
+                it('passes the correct arguments to send method', function() {
+                    expect(sendStub.called).toEqual(true);
+                    expect(sendStub.args[0][0]).toEqual('get');
+                    expect(sendStub.args[0][1]).toEqual('profiles');
+                    expect(sendStub.args[0][2]).toEqual({});
+                    expect(typeof(sendStub.args[0][3])).toEqual('function');
+                });
+            });
 
-                    namely = new Namely({
-                        accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
-                        companyName: 'companyName'
+            describe('post', function () {
+                beforeEach(function () {
+                    namely.post('profiles', {}, function () {});
+                });
+
+                it('passes the correct arguments to send method', function() {
+                    expect(sendStub.called).toEqual(true);
+                    expect(sendStub.args[0][0]).toEqual('post');
+                    expect(sendStub.args[0][1]).toEqual('profiles');
+                    expect(sendStub.args[0][2]).toEqual({});
+                    expect(typeof(sendStub.args[0][3])).toEqual('function');
+                });
+            });
+
+            describe('put', function () {
+                beforeEach(function () {
+                    namely.put('profiles/1', {}, function () {});
+                });
+
+                it('passes the correct arguments to send method', function() {
+                    expect(sendStub.called).toEqual(true);
+                    expect(sendStub.args[0][0]).toEqual('put');
+                    expect(sendStub.args[0][1]).toEqual('profiles/1');
+                    expect(sendStub.args[0][2]).toEqual({});
+                    expect(typeof(sendStub.args[0][3])).toEqual('function');
+                });
+            });
+        });
+
+        describe('send', function () {
+            var sendSpy;
+
+            beforeEach(function () {
+                namely = new Namely({
+                    accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
+                    companyName: 'companyName'
+                });
+
+                sendSpy = sandbox.spy(namely, 'send');
+
+                namely.profiles({}, function () {});
+            });
+
+            it('sets authorization access token in headers before sending request', function () {
+                expect(sendSpy.calledOnce).toEqual(true);
+
+                expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json');
+                expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                expect(stubs.request.get.args[0][1].headers.authorization).
+                    toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
+            });
+
+            it('calls request method passing correct arguments', function () {
+                expect(stubs.request.get.calledOnce).toEqual(true);
+                expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json');
+                expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                expect(stubs.request.get.args[0][1].headers.authorization).
+                    toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
+                expect(typeof(stubs.request.get.args[0][2])).toEqual('function');
+            });
+
+            describe('with no options', function () {
+                before(function () {
+                    namely.profiles(function () {});
+                });
+
+                it('sets the callback to be opts', function () {
+                    expect(sendSpy.calledOnce).toEqual(true);
+                    expect(stubs.request.get.args[0][0]).toEqual('https://companyName.namely.com/api/v1/profiles.json')
+                    expect(typeof(stubs.request.get.args[0][1])).toEqual('object');
+                    expect(typeof(stubs.request.get.args[0][1].headers)).toEqual('object');
+                    expect(stubs.request.get.args[0][1].headers.authorization).
+                        toEqual('Bearer UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT');
+                    expect(typeof(stubs.request.get.args[0][2])).toEqual('function');
+                });
+            });
+
+            describe('callback', function () {
+                var callbackSpy;
+
+                beforeEach(function () {
+                    callbackSpy = sandbox.spy();
+                });
+
+                describe('error', function () {
+                    beforeEach(function () {
+                        stubs = {
+                            request: {
+                                get: sandbox.stub().yields('Fake Error', {}, {})
+                            }
+                        };
+
+                        Namely = proxyquire('..', stubs);
+
+                        namely = new Namely({
+                            accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
+                            companyName: 'companyName'
+                        });
+                    });
+
+                    it('calls callback with error if error returned', function () {
+                        namely.profiles({}, callbackSpy);
+                        expect(callbackSpy.calledOnce).toEqual(true);
+                        expect(callbackSpy.calledWith('Fake Error')).toEqual(true);
                     });
                 });
 
-                it('calls callback with error if error returned', function () {
-                    namely.profiles({}, callbackSpy);
-                    expect(callbackSpy.calledOnce).toEqual(true);
-                    expect(callbackSpy.calledWith('Fake Error')).toEqual(true);
-                });
-            });
+                describe('no error', function () {
+                    beforeEach(function () {
+                        stubs = {
+                            request: {
+                                get: sandbox.stub().yields(null, {
+                                    a: '1',
+                                    b: '2',
+                                    c: '3'
+                                }, {
+                                    d: '4',
+                                    e: '5',
+                                    f: '6'
+                                })
+                            }
+                        };
 
-            describe('no error', function () {
-                beforeEach(function () {
-                    stubs = {
-                        request: sandbox.stub().yields(null, {
+                        Namely = proxyquire('..', stubs);
+
+                        namely = new Namely({
+                            accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
+                            companyName: 'companyName'
+                        });
+                    });
+
+                    it('calls callback with results if no error returned', function () {
+                        namely.profiles({}, callbackSpy);
+
+                        expect(callbackSpy.calledOnce).toEqual(true);
+                        expect(callbackSpy.calledWith(null, {
                             a: '1',
                             b: '2',
                             c: '3'
@@ -254,30 +368,8 @@ describe('index', function () {
                             d: '4',
                             e: '5',
                             f: '6'
-                        })
-                    };
-
-                    Namely = proxyquire('..', stubs);
-
-                    namely = new Namely({
-                        accessToken: 'UBLIJWQAPSONNTCLWQEFOZCCESLEJRVT',
-                        companyName: 'companyName'
+                        })).toEqual(true);
                     });
-                });
-
-                it('calls callback with error if error returned', function () {
-                    namely.profiles({}, callbackSpy);
-
-                    expect(callbackSpy.calledOnce).toEqual(true);
-                    expect(callbackSpy.calledWith(null, {
-                        a: '1',
-                        b: '2',
-                        c: '3'
-                    }, {
-                        d: '4',
-                        e: '5',
-                        f: '6'
-                    })).toEqual(true);
                 });
             });
         });

@@ -1,6 +1,9 @@
 'use strict';
 
-var request = require('request');
+var methods = ['get', 'post', 'put'],
+    request = require('request').defaults({
+        json: true
+    });
 
 function Namely(options) {
     options = options || {};
@@ -8,7 +11,7 @@ function Namely(options) {
     this.accessToken = options.accessToken;
     this.apiVersion  = options.apiVersion || 'v1';
     this.companyName = options.companyName;
-    this.apiEndpoint = 'https://' + this.companyName + '.namely.com/api/' + this.apiVersion;
+    this.apiEndpoint = 'https://' + this.companyName + '.namely.com/api/' + this.apiVersion + '/';
 
     if (this.accessToken === undefined) {
         throw new Error('Namely must be initialized with an access token');
@@ -19,17 +22,19 @@ function Namely(options) {
     }
 }
 
-Namely.prototype.send = function (path, opts, cb) {
-    path = path + '.json';
-    opts = opts || {};
+Namely.prototype.send = function (method, path, opts, cb) {
+    path = this.apiEndpoint + path + '.json';
+
+    if (typeof opts === 'function') {
+        cb = opts;
+        opts = {};
+    }
 
     opts.headers = {
         authorization: 'Bearer ' + this.accessToken
     };
 
-    opts.json = true;
-
-    request(path, opts, function (error, response, body) {
+    request[method](path, opts, function (error, response, body) {
         if (error) {
             return cb(error);
         }
@@ -38,8 +43,14 @@ Namely.prototype.send = function (path, opts, cb) {
     });
 };
 
+methods.forEach(function (method) {
+    Namely.prototype[method] = function (path, opts, cb) {
+        return this.send(method, path, opts, cb);
+    };
+});
+
 Namely.prototype.profiles = function (opts, cb) {
-    this.send(this.apiEndpoint + '/profiles', opts, cb);
+    this.get('profiles', opts, cb);
 };
 
 module.exports = Namely;
