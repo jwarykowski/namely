@@ -12,6 +12,7 @@ function Namely(options) {
     this.apiVersion  = options.apiVersion || 'v1';
     this.companyName = options.companyName;
     this.apiEndpoint = 'https://' + this.companyName + '.namely.com/api/' + this.apiVersion;
+    this.hideSalary  = options.hideSalary || true;
 
     if (this.accessToken === undefined) {
         throw new Error('Namely must be initialized with an access token');
@@ -22,10 +23,18 @@ function Namely(options) {
     }
 }
 
-function send (method, path, opts, cb) {
+function send (method, path, opts, cb, resOpts) {
     request[method](path, opts, function (error, response, body) {
         if (error) {
             return cb(error);
+        }
+
+        if (resOpts.hideSalary) {
+            if (body.profiles) {
+                body.profiles.forEach(function (profile) {
+                    delete profile.salary
+                });
+            }
         }
 
         cb(null, response, body);
@@ -34,6 +43,10 @@ function send (method, path, opts, cb) {
 
 methods.forEach(function (method) {
     Namely.prototype[method] = function (path, opts, cb) {
+        var resOpts = {
+            hideSalary: this.hideSalary
+        };
+
         if (typeof opts === 'function') {
             cb = opts;
             opts = {};
@@ -45,7 +58,7 @@ methods.forEach(function (method) {
             authorization: 'Bearer ' + this.accessToken
         };
 
-        return send(method, path, opts, cb);
+        return send(method, path, opts, cb, resOpts);
     };
 });
 
